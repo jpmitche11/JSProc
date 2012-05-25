@@ -1,0 +1,28 @@
+<project name="PA2" default="build" basedir=".">
+   
+  <target name="build">
+   
+  	<java classname="JLex.Main" classpath="../libs/jlex.jar">
+  		<arg value="./js.lex"/>
+  	</java>
+  	
+  	 <move tofile="src/net/jpm/jslex/JSLexer.java" file="./js.lex.java"/>
+  	
+  	<javac classpath="../libs/java-cup-11a.jar" srcdir="./src" destdir="./build"/>
+  	 
+  	
+  
+  	
+  </target>
+	
+	<target name="clean">
+	   
+		<delete file="build/*.class">
+			<fileset dir="build" includes="**/*"/>
+		</delete> 
+		<delete file="src/net/jpm/jslex/JSLexer.java"/>
+			  
+    </target>
+
+ 
+</project>
