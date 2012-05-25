@@ -88,6 +88,7 @@ import java_cup.runtime.Symbol;
 LETTER = [a-zA-Z]
 DIGIT = [0-9]
 ALPHANUM = [a-zA-Z0-9]
+LINE = (\r\n)|(\n)
 %%
 
 
@@ -110,7 +111,7 @@ ALPHANUM = [a-zA-Z0-9]
 }
 
 
-<YYINITIAL>--[^\n]* { 
+<YYINITIAL>//[^\n]* { 
     //Line Comment
 }
 
