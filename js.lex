@@ -5,34 +5,29 @@
 package net.jpm.jslex;
 import java_cup.runtime.Symbol;
 
+
 %%
 
 %{
 
-    //Level of comment nesting. 0 if outside of a comment, 1 if inside a comment, 2 if inside a nested comment ....
-    private int commentNesting = 0;
     
     //holds string contents;
     private StringBuffer stringData = null;
-    private int maxStringLength = 1024;
+    private String stringQuote;
     private String errStr;
     
-    private StringTable stringTable = AbstractTable.stringtable;
-    private IdTable idTable = AbstractTable.idtable;
-    private IntTable intTable = AbstractTable.inttable;
-
+    private StringTable stringTable = new StringTable();
   
     public int get_curr_lineno() {
        return yyline+1;
     }
 
-    private AbstractSymbol filename;
-
+    String filename;
     public void set_filename(String fname) {
-        filename = AbstractTable.stringtable.addString(fname);
+        filename = stringTable.addString(fname);
     }
 
-    public AbstractSymbol curr_filename() {
+    public String curr_filename() {
         return filename;
     }
 %}
@@ -92,56 +87,53 @@ LINE = (\r\n)|(\n)
 %%
 
 
-<YYINITIAL, COMMENT>"(*" {
+<YYINITIAL, COMMENT>"/*" {
 //Comments
-    this.commentNesting++;
     yybegin(COMMENT);   
 }
 
-<COMMENT>"*)" {
-    this.commentNesting--;
-    if(this.commentNesting == 0){
-        yybegin(YYINITIAL);      
-    }
+<COMMENT>"*/" {
+    yybegin(YYINITIAL);
 }
 <COMMENT>\n|[^\n] { } 
 
-<YYINITIAL>"*)" {
-    return new Symbol(TokenConstants.ERROR, "Unmatched *)" );
+<YYINITIAL>"*/" {
+    return new Symbol(TokenConstants.ERROR, "Unmatched Comment end */" );
 }
-
 
 <YYINITIAL>//[^\n]* { 
     //Line Comment
 }
 
 
-<YYINITIAL>\" {
+<YYINITIAL>\"|\' {
     yybegin(STRING);
+    stringQuote = yytext();
+    
+   // System.out.println("Begin String: "+stringQuote);
     stringData = new StringBuffer();
 }
 
-<STRING>\" {
-    yybegin(YYINITIAL);
-    
-    if(stringData.length() > maxStringLength){
-        return new Symbol(TokenConstants.ERROR, "String constant too long");
+<STRING>\"|\' {    
+   // System.out.println("Process string quote: "+yytext());
+    if(stringQuote.equals(yytext())){
+        yybegin(YYINITIAL);
+        return new Symbol(TokenConstants.STR_CONST, this.stringTable.addString( stringData.toString() ) );
     }
-    
-    return new Symbol(TokenConstants.STR_CONST, this.stringTable.addString( stringData.toString() ) );  
+    else{
+        stringData.append(yytext());
+    }
 }
 
-
-<STRING>\\\000 { yybegin(STRING_NULL); errStr = "String contains escaped null character"; }
 <STRING>\000 { yybegin(STRING_NULL); errStr = "String contains null character"; }
-<STRING_NULL>\"|\n {
+<STRING_NULL>\"|\'|\n {
      yybegin(YYINITIAL);
      return new Symbol(TokenConstants.ERROR, errStr);     
 }
 <STRING_NULL>.|\\\n {}
 
 
-<STRING>\n {
+<STRING>\r|\n {
     yybegin(YYINITIAL);
     return new Symbol(TokenConstants.ERROR, "Unterminated string constant");
 }
@@ -149,6 +141,9 @@ LINE = (\r\n)|(\n)
 
 <STRING>"\n" {
     stringData.append("\n");
+}
+<STRING>"\r" {
+    stringData.append("\r");
 }
 <STRING>"\b" {
     stringData.append("\b");
@@ -159,8 +154,12 @@ LINE = (\r\n)|(\n)
 <STRING>"\f" {
     stringData.append("\f");
 }
+<STRING>\013 {
+   // stringData.append("\v");
+   return new Symbol(TokenConstants.ERROR, "Vertical tab in string"); 
+}
 
-<STRING>[^\n] {
+<STRING>[^\n\r] {
     stringData.append(yytext());
 }
 
@@ -201,60 +200,23 @@ LINE = (\r\n)|(\n)
 
 
 
-<YYINITIAL>[iI][fF] {    return new Symbol(TokenConstants.IF);  }
-<YYINITIAL>[tT][hH][eE][nN] {    return new Symbol(TokenConstants.THEN);  }
-<YYINITIAL>[eE][lL][sS][eE] {    return new Symbol(TokenConstants.ELSE);  }
-<YYINITIAL>[fF][iI] {    return new Symbol(TokenConstants.FI);  }
-
-<YYINITIAL>[wW][hH][iI][lL][eE] {    return new Symbol(TokenConstants.WHILE);  }
-<YYINITIAL>[lL][oO][oO][pP] {    return new Symbol(TokenConstants.LOOP);  }
-<YYINITIAL>[pP][oO][oO][lL] {    return new Symbol(TokenConstants.POOL);  }
-
-<YYINITIAL>[lL][eE][tT] {    return new Symbol(TokenConstants.LET);  }
-<YYINITIAL>[iI][nN] {    return new Symbol(TokenConstants.IN);  }
-
-<YYINITIAL>[cC][lL][aA][sS][sS] {    return new Symbol(TokenConstants.CLASS);  }
-<YYINITIAL>[iI][nN][hH][eE][rR][iI][Tt][sS] {    return new Symbol(TokenConstants.INHERITS);  }
-
-
-<YYINITIAL>[cC][aA][sS][eE] {    return new Symbol(TokenConstants.CASE);  }
-<YYINITIAL>[oO][fF] {    return new Symbol(TokenConstants.OF);  }
-<YYINITIAL>[eE][sS][aA][cC] {    return new Symbol(TokenConstants.ESAC);  }
-
-<YYINITIAL>[iI][sS][vV][oO][iI][dD] {    return new Symbol(TokenConstants.ISVOID);  }
-<YYINITIAL>[nN][oO][tT] {    return new Symbol(TokenConstants.NOT);  }
-<YYINITIAL>[nN][eE][wW] {    return new Symbol(TokenConstants.NEW);  }
-
-<YYINITIAL>t[rR][uU][eE] {    return new Symbol(TokenConstants.BOOL_CONST, true);  }
-<YYINITIAL>f[aA][lL][sS][eE] {    return new Symbol(TokenConstants.BOOL_CONST, false);  }
-
+<YYINITIAL>if {    return new Symbol(TokenConstants.IF);  }
 
 <YYINITIAL>(" "|\t|\r|\f|\n|\013)+ {  
   //  System.out.println("Whitespace"); 
 }
 
 <YYINITIAL>[a-z]({ALPHANUM}|_)* {
-  return new Symbol(TokenConstants.OBJECTID, this.idTable.addString(yytext()) );  
+  return new Symbol(TokenConstants.OBJECTID, this.stringTable.addString(yytext()) );  
 }
 
 <YYINITIAL>[A-Z]({ALPHANUM}|_)* {
-  return new Symbol(TokenConstants.TYPEID, this.idTable.addString(yytext()) );  
+  return new Symbol(TokenConstants.TYPEID, this.stringTable.addString(yytext()) );  
 }
 
 <YYINITIAL>{DIGIT}+ {
-  return new Symbol(TokenConstants.INT_CONST, this.intTable.addString(yytext()) );  
+  return new Symbol(TokenConstants.INT_CONST, this.stringTable.addString(yytext()) );  
 }
-
-
-
-<YYINITIAL>{LETTER}({ALPHANUM}|_)* {
-    System.out.println("Identifier: "+yytext());
-   // return new Symbol(TokenConstants.CLASS);
-}
-
-
-
-
 
 
 
