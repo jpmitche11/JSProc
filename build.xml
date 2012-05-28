@@ -1,28 +1,54 @@
 <project name="PA2" default="build" basedir=".">
-   
-  <target name="build">
-   
-  	<java classname="JLex.Main" classpath="../libs/jlex.jar">
-  		<arg value="./js.lex"/>
-  	</java>
-  	
-  	 <move tofile="src/net/jpm/jslex/JSLexer.java" file="./js.lex.java"/>
-  	
-  	<javac classpath="../libs/java-cup-11a.jar" srcdir="./src" destdir="./build"/>
-  	 
-  	
-  
-  	
-  </target>
+
+	<property name = "lexdir" location="./src/net/jpm/jsproc/lex" />
+	<property name = "cupdir" location="./src/net/jpm/jsproc/cup" />
+
+	<target name="build" depends="parser,lexer">
+		
+		
+		<antcall target="parser"/>
+		<antcall target="lexer"/>
+		<antcall target="compile"/>
+
+
+
+
+	</target>
+
+	<target name="compile">
+		  <javac classpath="../libs/java-cup-11a.jar" srcdir="./src" destdir="./build"/>
+	</target>
+	
+	<target name="lexer">
+		<java classname="JLex.Main" classpath="../libs/jlex.jar">
+            <arg value="${lexdir}/js.lex"/>
+        </java>
+
+        <move tofile="${lexdir}/JSLexer.java" file="${lexdir}/js.lex.java"/>             
+    </target>
+	
+	<target name="parser">
+		<java classname="java_cup.Main" classpath="../libs/java-cup-11a.jar">
+            <arg line="-parser JsParser -symbols TokenConstants -expect 10000 -dump -nopositions ${cupdir}/js.cup"/>
+        </java>
+		
+        <move todir="${cupdir}" file="./JsParser.java"/>
+        <move todir="${cupdir}" file="./TokenConstants.java"/>	
+	</target>
+	
+	
 	
 	<target name="clean">
-	   
+
 		<delete file="build/*.class">
 			<fileset dir="build" includes="**/*"/>
-		</delete> 
-		<delete file="src/net/jpm/jslex/JSLexer.java"/>
-			  
-    </target>
+		</delete>
+		<delete file="${lexdir}/JSLexer.java"/>
+		
+		<delete file="${cupdir}/CoolParser.java"/>
+        <delete file="${cupdir}/TokenConstants.java"/>
 
- 
+	</target>
+
+
 </project>
