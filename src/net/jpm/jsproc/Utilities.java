@@ -23,9 +23,9 @@ PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 import java.io.PrintStream;
 
 import java_cup.runtime.Symbol;
-import net.jpm.jsproc.TokenConstants;
+import net.jpm.jsproc.cup.TokenConstants;
 
-class Utilities {
+public class Utilities {
 	
 	/** Prints error message and exits 
 	 *
@@ -41,7 +41,15 @@ class Utilities {
 	 * @param str the output stream
 	 * @param s the string to print
 	 * */
-	public static String escapeString(String s) {
+	public static String escapeString(Object o) {
+		String s;
+		if(o instanceof String){
+			s = (String)o;
+		}
+		else{
+			s = "" + o;
+		}
+		
 		StringBuilder out = new StringBuilder();
 		for (int i = 0; i < s.length(); i++) {
 			char c = s.charAt(i);
@@ -66,11 +74,12 @@ class Utilities {
 					case 2:
 						out.append('0');
 					default:
-						out.append(octal);
+						out.append(octal); 
 					}
 				}
 			}
 		}
+		
 		return out.toString();
 	}
 
@@ -81,50 +90,123 @@ class Utilities {
 	 * */
 	public static String tokenToString(Symbol s) {
 		switch (s.sym) {
-		case TokenConstants.CLASS:      return("CLASS");
-		case TokenConstants.ELSE:       return("ELSE");
-		case TokenConstants.FI:         return("FI");
-		case TokenConstants.IF:         return("IF");
-		case TokenConstants.IN:         return("IN");
-		case TokenConstants.INHERITS:   return("INHERITS");
-		case TokenConstants.LET:        return("LET");  
-		case TokenConstants.LOOP:       return("LOOP"); 
-		case TokenConstants.POOL:       return("POOL"); 
-		case TokenConstants.THEN:       return("THEN"); 
-		case TokenConstants.WHILE:      return("WHILE"); 
-		case TokenConstants.ASSIGN:     return("ASSIGN");
-		case TokenConstants.CASE:       return("CASE");  
-		case TokenConstants.ESAC:       return("ESAC");  
-		case TokenConstants.OF:         return("OF");    
-		case TokenConstants.DARROW:     return("DARROW");
-		case TokenConstants.NEW:        return("NEW");   
-		case TokenConstants.STR_CONST:  return("STR_CONST");
-		case TokenConstants.INT_CONST:  return("INT_CONST");
-		case TokenConstants.BOOL_CONST: return("BOOL_CONST");
-		case TokenConstants.TYPEID:     return("TYPEID"); 
-		case TokenConstants.OBJECTID:   return("OBJECTID");
-		case TokenConstants.ERROR:      return("ERROR"); 
-		case TokenConstants.error:      return("ERROR"); 
-		case TokenConstants.LE:         return("LE");    
-		case TokenConstants.NOT:        return("NOT");   
-		case TokenConstants.ISVOID:     return("ISVOID");
-		case TokenConstants.PLUS:       return("'+'");
-		case TokenConstants.DIV:        return("'/'");
-		case TokenConstants.MINUS:      return("'-'");
-		case TokenConstants.MULT:       return("'*'");
-		case TokenConstants.EQ:         return("'='");
-		case TokenConstants.LT:         return("'<'");
-		case TokenConstants.DOT:        return("'.'");
-		case TokenConstants.NEG:        return("'~'");
-		case TokenConstants.COMMA:      return("','");
-		case TokenConstants.SEMI:       return("';'");
-		case TokenConstants.COLON:      return("':'");
-		case TokenConstants.LPAREN:     return("'('");
-		case TokenConstants.RPAREN:     return("')'");
-		case TokenConstants.AT:         return("'@'");
-		case TokenConstants.LBRACE:     return("'{'");
-		case TokenConstants.RBRACE:     return("'}'");
+		
+		case TokenConstants.LT:    return("<");
+		case TokenConstants.LE:    return("<=");
+		case TokenConstants.GT:    return(">");
+		case TokenConstants.GE:    return(">=");
+		
+		case TokenConstants.INSTANCEOF:    return("instanceof");
+		case TokenConstants.TYPEOF:    return("typeof");
+		
+		case TokenConstants.TRY:    return("try");
+		case TokenConstants.CATCH:    return("catch");
+		case TokenConstants.THROW:    return("throw");
+		
+		
+		
+		
+		
+		case TokenConstants.SEMI:    return(";");
+		case TokenConstants.COMMA:    return(",");
+		
+		case TokenConstants.LPAREN:    return("(");
+		case TokenConstants.RPAREN:    return(")");
+		
+		case TokenConstants.LBRACE:    return("{");
+		case TokenConstants.RBRACE:    return("}");
+		
+		case TokenConstants.ASSIGN:    return("=");
+		case TokenConstants.EQ:    return("==");
+		case TokenConstants.EQQ:    return("===");
+		
+		case TokenConstants.PLUS_EQ:    return("+=");
+		case TokenConstants.MINUS_EQ:    return("-=");
+		case TokenConstants.DIV_EQ:    return("/=");
+		case TokenConstants.MULT_EQ:    return("*=");
+		
+		case TokenConstants.OR_EQ:    return("|=");
+		case TokenConstants.XOR_EQ:    return("^=");
+		case TokenConstants.MOD_EQ:    return("%=");
+		
+		
+		case TokenConstants.RSHIFT_ZERO_EQ:    return(">>>=");
+		case TokenConstants.RSHIFT_EQ:    return(">>=");
+		case TokenConstants.LSHIFT_EQ:    return("<<=");
+		
+		case TokenConstants.RSHIFT_ZERO:    return(">>>");
+		case TokenConstants.FALSE:    return("false");
+		
+		case TokenConstants.NOT:    return("!");
+		
+		
+		case TokenConstants.NEQQ:    return("!==");
+		
+		case TokenConstants.VAR:    return("var");
+		case TokenConstants.BIN_AND:    return("&");
+		
+		case TokenConstants.BIN_XOR:    return("^");
+		
+		case TokenConstants.MOD:    return("%");
+		case TokenConstants.BIN_OR:    return("|");
+		
+		case TokenConstants.TRUE:    return("true");
+		case TokenConstants.PLUS:    return("+");
+		case TokenConstants.WHILE:    return("while");
+		case TokenConstants.DELETE:    return("delete");
+		case TokenConstants.CONDITIONAL:    return("?");
+		case TokenConstants.SWITCH:    return("switch");
+		case TokenConstants.DO:    return("do");
+		case TokenConstants.FOR:    return("for");
+		case TokenConstants.VOID:    return("void");
+		case TokenConstants.DIV:    return("/");
+		
+		case TokenConstants.RETURN:    return("return");
+		case TokenConstants.MULT:    return("*");
+		case TokenConstants.ELSE:    return("else");
+		
+		case TokenConstants.BREAK:    return("break");
+		case TokenConstants.DOT:    return(".");
+		case TokenConstants.UNDEFINED:    return("undefined");
+		case TokenConstants.NULL:    return("null");
+		
+		
+		case TokenConstants.THIS:    return("this");
+		case TokenConstants.DEFAULT:    return("default");
+		
+		case TokenConstants.BIN_NOT:    return("~");
+		case TokenConstants.FUNCTION:    return("function");
+		case TokenConstants.AND_EQ:    return("&=");
+		case TokenConstants.MINUS:    return("-");
+		case TokenConstants.IN:    return("in");
+		case TokenConstants.OR:    return("or");
+		
+		case TokenConstants.FINALLY:    return("finally");
+		case TokenConstants.CONTINUE:    return("continue");
+		case TokenConstants.IF:    return("if");
+		
+		
+		case TokenConstants.MINUSMINUS:    return("--");
+		case TokenConstants.COLON:    return(":");
+		
+		case TokenConstants.RBRACKET:    return("]");
+		case TokenConstants.CASE:    return("case");
+		case TokenConstants.PLUSPLUS:    return("++");
+		case TokenConstants.NEW:    return("new");
+		case TokenConstants.RSHIFT:    return(">>");
+		case TokenConstants.NEQ:    return("!=");
+		case TokenConstants.AND:    return("&&");
+		case TokenConstants.LBRACKET:    return("[");
+		case TokenConstants.LSHIFT:    return("<<");
+		case TokenConstants.WITH:    return("WITH");
+
+		
+		case TokenConstants.ID: return("ID");
+		case TokenConstants.STRING_CONST: return("STRING");
+		case TokenConstants.NUMBER_CONST: return("NUMBER");
+		case TokenConstants.REGEXP_CONST: return("RegExp Literal");
 		case TokenConstants.EOF:        return("EOF");
+		case TokenConstants.ERROR:    return("<ERROR>: " + s.value);
 		default:                        return("<Invalid Token: " + s.sym + ">");
 		}
 	}
@@ -137,8 +219,9 @@ class Utilities {
 		System.out.print(tokenToString(s));
 
 		if(s.value!=null){
-			System.out.println(" "+escapeString((String)s.value));
+			System.out.print(" "+escapeString(s.value));
 		}
+		System.out.println("");
 	}
 
 	/** Dumps a token to the specified stream
@@ -151,8 +234,10 @@ class Utilities {
 		
 
 		if(s.value!=null){
-			str.println(" "+escapeString((String)s.value));
+			str.print(" "+escapeString(s.value));
+			
 		}
+		System.out.println("");
 
 	}
 

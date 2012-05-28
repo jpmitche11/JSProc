@@ -25,9 +25,11 @@ import java.io.FileReader;
 import java.io.IOException;
 
 import java_cup.runtime.Symbol;
+import net.jpm.jsproc.cup.TokenConstants;
+import net.jpm.jsproc.lex.JSLexer;
 
 /** The lexer driver class */
-class Lexer {
+public class Lexer {
 
     /** Loops over lexed tokens, printing them out to the console */
 	public static void main(String[] args) {
@@ -40,12 +42,12 @@ class Lexer {
 
 				System.out.println("#name \"" + args[i] + "\"");
 				JSLexer lexer = new JSLexer(file);
-				lexer.set_filename(args[i]);
+				lexer.setFileName(args[i]);
 				Symbol s;
 
 				do{
 					s = lexer.next_token();
-					Utilities.dumpToken(System.out, lexer.get_curr_lineno(), s);
+					Utilities.dumpToken(System.out, lexer.getCurrentLineNum(), s);
 				}while(s.sym != TokenConstants.EOF);
 
 

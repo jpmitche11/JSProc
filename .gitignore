@@ -1,3 +1,4 @@
 build
-src/net/jpm/jsprox/lex/JSLexer.java
-src/net/jpm/jsprox/cup/JSParser.java
+src/net/jpm/jsproc/lex/JSLexer.java
+src/net/jpm/jsproc/cup/JSParser.java
+src/net/jpm/jsproc/cup/TokenConstants.java

@@ -32,7 +32,7 @@
             <arg line="-parser JSParser -symbols TokenConstants -expect 10000 -dump -nopositions ${cupdir}/js.cup"/>
         </java>
 		
-        <move todir="${cupdir}" file="./JsParser.java"/>
+        <move todir="${cupdir}" file="./JSParser.java"/>
         <move todir="${cupdir}" file="./TokenConstants.java"/>	
 	</target>
 	
@@ -45,10 +45,16 @@
 		</delete>
 		<delete file="${lexdir}/JSLexer.java"/>
 		
-		<delete file="${cupdir}/CoolParser.java"/>
+		<delete file="${cupdir}/JSParser.java"/>
         <delete file="${cupdir}/TokenConstants.java"/>
 
 	</target>
 
+	
+	<target name="test">
+		<java classname="net.jpm.jsproc.Lexer" classpath="./build/:../libs/java-cup-11a.jar">
+            <arg line="test.js"/>
+        </java>
+    </target>
 
 </project>
