@@ -29,7 +29,7 @@
 	
 	<target name="parser">
 		<java classname="java_cup.Main" classpath="../libs/java-cup-11a.jar">
-            <arg line="-parser JsParser -symbols TokenConstants -expect 10000 -dump -nopositions ${cupdir}/js.cup"/>
+            <arg line="-parser JSParser -symbols TokenConstants -expect 10000 -dump -nopositions ${cupdir}/js.cup"/>
         </java>
 		
         <move todir="${cupdir}" file="./JsParser.java"/>

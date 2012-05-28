@@ -1,2 +1,3 @@
 build
-src/net/jpm/jslex/JSLexer.java
+src/net/jpm/jsprox/lex/JSLexer.java
+src/net/jpm/jsprox/cup/JSParser.java
